@@ -1,3 +1,8 @@
+html,
+body {
+  height: 100%;
+}
+
 body {
 	background-image: linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
 	background-image: -o-linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
@@ -14,40 +19,78 @@ body {
 	);
 }
 
-#board {
-	
+#container {
+	height: 100%;
 }
 
-.place {
-	display: inline-block;
-	height: 200px;
-	width: 200px;
-	overflow: hidden;
-	border: 1px solid #EEE;
-	border-radius: 5px;
-	margin: 5px;
+.element {
+  width: 110px;
+  height: 110px;
+  margin: 5px;
+  float: left;
+  overflow: hidden;
+  position: relative;
+  background: #888;
+  color: #222;
+  -webkit-border-radius: .5em;
+      -moz-border-radius: .5em;
+          border-radius: .5em;
+  /***  CSS Gradient  ***/
+  /*  Chrome 1-9 and Safari 4-5.0  */
+  background-image: -webkit-gradient(linear, left top, left bottom,
+        color-stop( 0.0, rgb(255, 255, 255) ),
+        color-stop( 1.0, rgb(213, 213, 213) ));
+
+  /*  Chrome 10+ Safari 5.1+ Mobile Safari  */
+  background-image: -webkit-linear-gradient(top,
+        rgb(255, 255, 255), 
+        rgb(213, 213, 213) );
+
+  /*  Firefox 3.6+  */
+  background-image: -moz-linear-gradient(top,
+        rgb(255, 255, 255), 
+        rgb(213, 213, 213) );
+
+  /*  IE 10+  */
+  background-image: -ms-linear-gradient(top,
+        rgb(255, 255, 255), 
+        rgb(213, 213, 213) );
+
+  /*  Opera 11.10+  */
+  background-image: -o-linear-gradient(top,
+        rgb(255, 255, 255), 
+        rgb(213, 213, 213) );
+
+  /*  W3C  */
+  background-image: linear-gradient(top,
+        rgb(255, 255, 255), 
+        rgb(213, 213, 213) );
+
+-moz-box-shadow:inset 0px 2px 1px #999;
+-webkit-box-shadow:inset 0px 2px 1px #999;
+box-shadow:inset 0px 2px 1px #999;
 }
 
-.place.width1 {
-	width: 198px;
+.element.width1 {
+	width: 110px;
 }
-.place.width2 {
-	width: 398px;
+.element.width2 {
+	width: 230px;
 }
-.place.width3 {
-	width: 598px;
+.element.width3 {
+	width: 350px;
 }
-.place.width4 {
-	width: 798px;
+.element.width4 {
+	width: 470px;
 }
-.place.height1 {
-	height: 198px;
+.element.height1 {
+	height: 110px;
 }
-.place.height2 {
-	height: 398px;
+.element.height2 {
+	height: 230px;
 }
-.place.height3 {
-	height: 598px;
+.element.height3 {
+	height: 350px;
 }
 
 

@@ -17,17 +17,36 @@
   $(document).ready(function(){
     $.YQL("select * from html where url=\"http://pinterest.com/tcheller/local-bookstores/\" and xpath=\"//a[@class='PinImage ImgLink']\"",function(content){
       $(content.query.results.a).each(function(){
-        $('#board').append(
-          $(document.createElement('div')).addClass('place').addClass('height'+Math.floor(Math.random()*2+1)).addClass('width'+Math.floor(Math.random()*3+1)).append(
+        $('#container').append(
+          $(document.createElement('div')).addClass('element').addClass('height'+Math.floor(Math.random()*2+1)).addClass('width'+Math.floor(Math.random()*3+1)).append(
             $(document.createElement('img')).attr('src',this.img.src.replace("_b.jpg","_f.jpg"))
           )
         )
       });
 
-      $('#board').isotope({
-        masonry: {
-          columnWidth: 100
-        }
+      $(function(){
+        
+        var $container = $('#container');
+        
+        
+        // add randomish size classes        
+        $container.isotope({
+          itemSelector: '.element',
+          masonry : {
+            columnWidth : 120
+          }
+        });
+        
+        
+        // change size of clicked element
+        $container.delegate( '.element', 'click', function(){
+          $(this).toggleClass('large');
+          $container.isotope('reLayout');
+        });
+
+        
+
+        
       });
     });
   });
@@ -38,7 +57,7 @@
 
   </header>
   <div role="main">
-    <div id="board">
+    <div id="container">
 
     </div>
   </div>
