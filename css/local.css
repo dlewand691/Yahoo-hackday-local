@@ -1,0 +1,85 @@
+body {
+	background-image: linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
+	background-image: -o-linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
+	background-image: -moz-linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
+	background-image: -webkit-linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
+	background-image: -ms-linear-gradient(bottom, rgb(17,17,17) 33%, rgb(51,51,51) 67%);
+
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.33, rgb(17,17,17)),
+		color-stop(0.67, rgb(51,51,51))
+	);
+}
+
+#board {
+	
+}
+
+.place {
+	display: inline-block;
+	height: 200px;
+	width: 200px;
+	overflow: hidden;
+	border: 1px solid #EEE;
+	border-radius: 5px;
+	margin: 5px;
+}
+
+.place.width1 {
+	width: 198px;
+}
+.place.width2 {
+	width: 398px;
+}
+.place.width3 {
+	width: 598px;
+}
+.place.width4 {
+	width: 798px;
+}
+.place.height1 {
+	height: 198px;
+}
+.place.height2 {
+	height: 398px;
+}
+.place.height3 {
+	height: 598px;
+}
+
+
+
+
+
+
+
+
+
+.isotope,
+.isotope .isotope-item {
+  /* change duration value to whatever you like */
+  -webkit-transition-duration: 0.8s;
+     -moz-transition-duration: 0.8s;
+      -ms-transition-duration: 0.8s;
+       -o-transition-duration: 0.8s;
+          transition-duration: 0.8s;
+}
+
+.isotope {
+  -webkit-transition-property: height, width;
+     -moz-transition-property: height, width;
+      -ms-transition-property: height, width;
+       -o-transition-property: height, width;
+          transition-property: height, width;
+}
+
+.isotope .isotope-item {
+  -webkit-transition-property: -webkit-transform, opacity;
+     -moz-transition-property:    -moz-transform, opacity;
+      -ms-transition-property:     -ms-transform, opacity;
+       -o-transition-property:         top, left, opacity;
+          transition-property:         transform, opacity;
+}
