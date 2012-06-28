@@ -155,6 +155,10 @@ h2 {
   padding: 5px;
 }
 
+br {
+	clear: both;
+}
+
 ul, ol {
   margin-left: 1.5em;
 }
