@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  
+  <meta charset="utf-8" />
+  <title>reLayout &middot; Isotope Demo</title>
+  
+  <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+  <link rel="stylesheet" href="../css/style.css" />
+  
+  <!-- scripts at bottom of page -->
+
+</head>
+<body>
+  
+      
+      <h1>Find a restaurant near you</h1>
+    
+
+      <section id="copy">
+    <p>Click on any item element to change its size.</p>
+  </section>
+  
+  
+  <div id="container" class="variable-sizes clickable">
+    
+          
+    <div class="element">
+      <p class="number">1</p>
+      <h3 class="symbol"> </h3>
+      <h2 class="name">Restaurant name
+      <br/>
+	      <p class="weight">Type of food</p>
+      </h2>
+      
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">2</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">3</p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">4</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"</p>
+    </div>
+    
+          
+    <div class="element loid   ">
+      <p class="number">5</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">6</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">7</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">8</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">9</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">10</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">11</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">12</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">13</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">14</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">15</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">16</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">17</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">18</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element">
+      <p class="number">19</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+          
+    <div class="element"  >
+      <p class="number">20</p>
+      <h3 class="symbol"></h3>
+      <h2 class="name"></h2>
+      <p class="weight"></p>
+    </div>
+    
+  </div> <!-- #container -->
+  
+  <script src="../js/jquery-1.7.1.min.js"></script>
+  <script src="../jquery.isotope.min.js"></script>
+  <script>
+    $(function(){
+      
+      var $container = $('#container');
+      
+      
+      // add randomish size classes
+      $container.find('.element').each(function(){
+        var $this = $(this),
+            number = parseInt( $this.find('.number').text(), 10 );
+        if ( number % 7 % 2 === 1 ) {
+          $this.addClass('width2');
+        }
+        if ( number % 3 === 0 ) {
+          $this.addClass('height2');
+        }
+      });
+      
+      $container.isotope({
+        itemSelector: '.element',
+        masonry : {
+          columnWidth : 120
+        }
+      });
+      
+      
+      // change size of clicked element
+      $container.delegate( '.element', 'click', function(){
+        $(this).toggleClass('large');
+        $container.isotope('reLayout');
+      });
+
+      
+
+      
+    });
+  </script>
+  
+
+  
+
+</body>
+</html>
