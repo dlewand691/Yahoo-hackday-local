@@ -29,6 +29,8 @@
 		var pinterestData = [];
 		var categories = ['restaurants','clothiers','jewelers','bookstores','grocers'];
 		var currPage = 0;
+		var noMovementTimer = setTimeout(function(){noMovement();}, 7500);
+		var consecutiveRedrawsFromIdle = 0;
 
 		$(function(){
 			drawSpinner();
@@ -70,6 +72,15 @@
 					}
 				}
 			});
+
+			$('#main').mousemove(function(){
+				clearTimeout(noMovementTimer);
+				noMovementTimer = setTimeout(function(){noMovement();}, 7500);
+			});
+
+			$('#logo').click(function(){
+				showTicker();
+			})
 		});
 
 		function getAtlasData(_category) {
@@ -148,12 +159,13 @@
 			$('#container').append($(document.createElement('div')).addClass('page').attr('id',_category));
 
 			$('#container #'+_category+'.page').append(
-				$(document.createElement('h1')).text(_category)
+				$(document.createElement('h1')).text(_category),
+				$(document.createElement('div')).addClass('content')
 			);
 
 			if ($(pinterestData[_category].query.results).length > 0) {
 				$(pinterestData[_category].query.results.a).each(function(){
-					$('#container #'+_category+'.page').append(
+					$('#container #'+_category+'.page .content').append(
 						$(document.createElement('a')).attr('href','#'+this.href.split('/')[2]).addClass('element height'+Math.floor(Math.random()*2+2) + ' width'+Math.floor(Math.random()*2+2))
 							.css({
 								'background': 'url('+this.img.src.replace("_b.jpg","_f.jpg")+')',
@@ -220,9 +232,9 @@
 
 		    }
 
-			// add randomish size classes
-			$('#container #'+categories[_category]+'.page').isotope({
+			$('#'+_category+'.page .content').isotope({
 				itemSelector: '.element',
+				resizesContainer: false,
 				masonry : {
 					columnWidth : 120
 				}
@@ -243,6 +255,7 @@
 			gotoCategory((currPage==0)?currPage:currPage-1);
 		}
 		function gotoCategory(_index) {
+			consecutiveRedrawsFromIdle = 0;
 			$('#container').animate({'margin-left': -1 * 840 * _index + 'px'});
 			currPage = _index;
 			$('.page').removeClass('prev next curr');
@@ -254,8 +267,6 @@
 				} else {
 					$(this).addClass('curr');
 				}
-
-				setTimeout(function(){$('.page').removeClass('prevFromCurr nextFromCurr currFromPrev currFromNext')}, 500);
 			});
 
 			if (currPage == 0) {
@@ -271,6 +282,7 @@
 		}
 
 		function drawOverlay(_id) {
+			clearTimeout(noMovementTimer);
 			var _obj = $('.element[rel='+_id+']');
 
 			$(document.createElement('div')).attr('id','white').css({
@@ -306,7 +318,9 @@
 					$(document.createElement('div')).addClass('bottom info').append(
 						$(document.createElement('div')).addClass('address').text('Address:'),
 						$(document.createElement('div')).addClass('addressData').html($(_obj).data('atlas')['streetAddress'] + '<br />' + $(_obj).data('atlas')['city'] + ', ' + $(_obj).data('atlas')['state'] + ' ' + $(_obj).data('atlas')['zipCode']),
-						$(document.createElement('div')).addClass('hours').text('Hours:'),
+						$(document.createElement('div')).addClass('hours').text('Hours:').append(
+							$(document.createElement('span')).addClass('open').text(' Open')
+						),
 						$(document.createElement('div')).addClass('hoursData').html('<span>Mon-Fri</span> '+$(_obj).data('atlas')['hrsmf']+'<br />'+'<span>Sat-Sun</span> '+$(_obj).data('atlas')['hrsss']),
 						$(document.createElement('div')).addClass('scan').text(''),
 						$(document.createElement('div')).addClass('code').append(
@@ -354,6 +368,7 @@
 		function clearOverlay() {
 			$('#overlay').fadeOut('200',function(){$(this).remove()});
 			$('#white').fadeOut('300',function(){$(this).remove()});
+			noMovementTimer = setTimeout(function(){noMovement();}, 7500);
 		}
 
 		function distanceBetweenPoints(_lat1,_lon1,_lat2,_lon2) {
@@ -441,6 +456,44 @@
 			$('.spinner').fadeOut('200',function(){$(this).remove()});
 			$('#white').fadeOut('300',function(){$(this).remove()});
 		}
+
+		function relayoutItems() {
+			$('.curr.page .content .element').each(function(){
+				$(this).removeClass('height2 height3 width2 width3 width4');
+				$(this).addClass('height'+Math.floor(Math.random()*2+2) + ' width'+Math.floor(Math.random()*2+2));
+				$('.curr.page .content').isotope('reLayout');
+			});
+		}
+
+		function noMovement() {
+			if($('#overlay').length == 0) {
+				relayoutItems();
+				consecutiveRedrawsFromIdle++;
+				if(consecutiveRedrawsFromIdle == 4) {
+					gotoCategory((currPage==$('.page').length-1)?0:currPage+1);
+				}
+				noMovementTimer = setTimeout(function(){noMovement();}, 7500);
+			} else {
+				clearTimeout(noMovementTimer);
+			}
+		}
+
+		function showTicker() {
+			$('#ticker').css({
+				'top': -1 * $('#ticker').outerHeight() + 'px',
+				'left': $('body').innerWidth()/2 - $('#ticker').outerWidth()/2 + 'px'
+			});
+			setTimeout(function(){
+				$('#ticker').animate({
+					'top': 1 * $('#ticker').outerHeight() + 'px'
+				});
+			},10000);
+			setTimeout(function(){
+				$('#ticker').animate({
+					'top': -1 * $('#ticker').outerHeight() + 'px',
+				});
+			},15000);
+		}
 	</script>
 
 </head>
@@ -448,7 +501,7 @@
 	
 	<div id="main" role="main">
 		<header>
-			<img src="assets/logo-shopSmall.png" style="width: 71px; height: 72px;" id="shopSmallLogo">
+			<img src="assets/logo-shopSmall.png" style="width: 71px; height: 72px;" id="logo">
 			<strong>New York</strong>
 		</header>
 		<div id="divider1"></div>
@@ -467,5 +520,10 @@
 
 		</footer>
 	</div>
+
+	<div id="ticker">
+		<p>M34 SBS CROSSTOWN EASTSIDE - FDR DR &nbsp;3min</p>
+		<p>M34 SBS CROSSTOWN JAVITS CTR - 12 AV 5min</p>
+	</a>
 </body>
 </html>

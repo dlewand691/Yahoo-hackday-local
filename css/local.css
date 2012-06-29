@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'digitaldream';
+    src: url('../fonts/DIGITALDREAM.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 html,
 body {
   min-height: 100%;
@@ -107,11 +114,14 @@ body {
 .isotope,
 .isotope .isotope-item {
   /* change duration value to whatever you like */
-  -webkit-transition-duration: 0.8s;
-     -moz-transition-duration: 0.8s;
-      -ms-transition-duration: 0.8s;
-       -o-transition-duration: 0.8s;
-          transition-duration: 0.8s;
+  -webkit-transition-duration: 750ms;
+     -moz-transition-duration: 750ms;
+      -ms-transition-duration: 750ms;
+       -o-transition-duration: 750ms;
+          transition-duration: 750ms;
+
+  -webkit-transition-timing-function: ease-in-out;
+          transition-timing-function: ease-in-out;
 }
 
 .isotope {
@@ -160,7 +170,7 @@ body {
 	color: #002263;
 	text-align: center;
 	-webkit-transition-property: *;
-	-webkit-transition-duration: 500ms;
+	-webkit-transition-duration: 450ms;
 }
 
 #container .page.prev h1,
@@ -176,8 +186,13 @@ body {
 #container .page.next h1 {
 	margin-left: -100%;
 }
+#container .page .content {
+	height: 100%;
+	width: 100%;
+	position: relative;
+}
 
-#shopSmallLogo {
+#logo {
 	display: block;
 	margin: 0 auto;
 }
@@ -190,6 +205,7 @@ header strong {
 	margin: 10px auto;
 	text-transform: uppercase;
 	text-align: center;
+	color: #002263;
 }
 
 #divider1 {
@@ -423,7 +439,10 @@ header strong {
 #overlay .right .bottom.info .code {
 	padding-top: 5px;
 }
-
+#overlay .right .bottom.info .hours span.open {
+	color: #090;
+	font-weight: 800;
+}
 
 #overlay .startPoint {
 	height: 36px;
@@ -472,7 +491,7 @@ div.spinner {
 div.spinner div {
 	width: 12%;
 	height: 26%;
-	background: #000;
+	background: #007DC3;
 	position: absolute;
 	left: 44.5%;
 	top: 37%;
@@ -498,4 +517,19 @@ div.spinner div.bar12 {-webkit-transform:rotate(330deg) translate(0, -142%); -we
 @-webkit-keyframes fade {
 	from {opacity: 1;}
 	to {opacity: 0.25;}
+}
+
+#ticker {
+	position: absolute;
+	top: -100px;
+	left: 10px;
+	font-family: 'digitaldream';
+	border: 10px solid #000;
+	background: #333;
+	z-index: 750;
+}
+#ticker p {
+	margin: 5px 10px;
+	color: #F00;
+	text-shadow: 0px 0px 5px rgba(255,0,0,.75);
 }
