@@ -31,6 +31,8 @@
 		var currPage = 0;
 
 		$(function(){
+			drawSpinner();
+
 			for(var i = 0; i<categories.length; i++) {
 				atlasData[categories[i]] = null;
 				getAtlasData(categories[i]);
@@ -149,28 +151,37 @@
 				$(document.createElement('h1')).text(_category)
 			);
 
-			$(pinterestData[_category].query.results.a).each(function(){
-				$('#container #'+_category+'.page').append(
-					$(document.createElement('a')).attr('href','#'+this.href.split('/')[2]).addClass('element height'+Math.floor(Math.random()*2+2) + ' width'+Math.floor(Math.random()*2+2))
-						.css({
-							'background': 'url('+this.img.src.replace("_b.jpg","_f.jpg")+')',
-						})
-						.attr({
-							'rel': this.href.split('/')[2]
-						})
-						.data('pinterest',{
-							'img': this.img.src.replace("_b.jpg","_f.jpg")
-						})
-						.append(
-							$(document.createElement('div')).addClass('infoButton'),
-							$(document.createElement('div')).addClass('caption').append(
-								$(document.createElement('div')).addClass('pointer'),
-								$(document.createElement('strong')).addClass('locationName'),
-								$(document.createElement('span')).addClass('locationDistance')
+			if ($(pinterestData[_category].query.results).length > 0) {
+				$(pinterestData[_category].query.results.a).each(function(){
+					$('#container #'+_category+'.page').append(
+						$(document.createElement('a')).attr('href','#'+this.href.split('/')[2]).addClass('element height'+Math.floor(Math.random()*2+2) + ' width'+Math.floor(Math.random()*2+2))
+							.css({
+								'background': 'url('+this.img.src.replace("_b.jpg","_f.jpg")+')',
+							})
+							.attr({
+								'rel': this.href.split('/')[2]
+							})
+							.data('pinterest',{
+								'img': this.img.src.replace("_b.jpg","_f.jpg")
+							})
+							.append(
+								$(document.createElement('div')).addClass('infoButton'),
+								$(document.createElement('div')).addClass('caption').append(
+									$(document.createElement('div')).addClass('pointer'),
+									$(document.createElement('strong')).addClass('locationName'),
+									$(document.createElement('span')).addClass('locationDistance')
+								)
 							)
-						)
+					)
+				});
+			} else {
+				$('#container #'+_category+'.page').append(
+					$(document.createElement('a')).attr('href','#oops').addClass('element height3 width4')
+						.css({
+							'background': 'url(assets/wait-ill-fix-it)',
+						})
 				)
-			});
+			}
 
 			/* Draw Atlas Data */
 		    var data = atlasData[_category].getDataTable();
@@ -192,7 +203,7 @@
 		        var locDist = distanceBetweenPoints(40.741681,-73.985088,lat,lon);
 
 		        $('.element[rel='+pinId+'] .locationName').text(name);
-		        $('.element[rel='+pinId+'] .locationDistance').text(locDist.km.toFixed(1) + 'km ' + locDist.dir);
+		        $('.element[rel='+pinId+'] .locationDistance').text(locDist.mi.toFixed(1) + 'mi ' + locDist.dir);
 		        $('.element[rel='+pinId+']').data('atlas',{
 		        	'name': name,
 		        	'streetAddress': streetAddress,
@@ -221,6 +232,7 @@
 				drawBoard(atlasData, pinterestData, categories[_category]);
 			}
 
+			clearSpinner();
 			gotoCategory(0);
 		}
 
@@ -231,7 +243,7 @@
 			gotoCategory((currPage==0)?currPage:currPage-1);
 		}
 		function gotoCategory(_index) {
-			$('#container').animate({'margin-left': -1 * 720 * _index + 'px'});
+			$('#container').animate({'margin-left': -1 * 840 * _index + 'px'});
 			currPage = _index;
 			$('.page').removeClass('prev next curr');
 			$('.page').each(function(){
@@ -249,9 +261,11 @@
 			if (currPage == 0) {
 				$('#arrow-left').fadeOut();
 				$('#arrow-right').fadeIn();
-			}
-			if (currPage == 0) {
-				$('#arrow-left').fadeOut();
+			} else if (currPage == $('.page').length - 1) {
+				$('#arrow-left').fadeIn();
+				$('#arrow-right').fadeOut();
+			} else {
+				$('#arrow-left').fadeIn();
 				$('#arrow-right').fadeIn();
 			}
 		}
@@ -262,11 +276,13 @@
 			$(document.createElement('div')).attr('id','white').css({
 				'width': $('body').innerWidth() + 'px',
 				'height': $('body').innerHeight() + 'px'
+			}).click(function(){
+				clearOverlay();
 			}).appendTo($('body'));
 
 			$(document.createElement('div')).attr('id','overlay').css({
-				'top': $('body').innerHeight()/2 - 320 + 'px',
-				'left': $('body').innerWidth()/2 - 320 + 'px'
+				'top': $('body').innerHeight()/2 - 345 + 'px',
+				'left': $('body').innerWidth()/2 - 345 + 'px'
 			}).append(
 				$(document.createElement('a')).addClass('close').attr('href','#close'),
 				$(document.createElement('div')).addClass('left').append(
@@ -274,7 +290,7 @@
 					$(document.createElement('div')).addClass('bottom details').append(
 						$(document.createElement('img')).addClass('point '+$(_obj).data('atlas')['locDist'].dir).attr('src','assets/point-blue.png'),
 						$(document.createElement('strong')).addClass('locationName').text($(_obj).data('atlas')['name']),
-						$(document.createElement('span')).addClass('locationDistance').text($(_obj).data('atlas')['locDist'].km.toFixed(1) + 'km ' + $(_obj).data('atlas')['locDist'].dir),
+						$(document.createElement('span')).addClass('locationDistance').text($(_obj).data('atlas')['locDist'].mi.toFixed(1) + 'mi ' + $(_obj).data('atlas')['locDist'].dir),
 						$(document.createElement('span')).addClass('locationDescription').html('<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tellus augue, laoreet a varius eget, congue nec ante. Sed feugiat elementum odio ut molestie.</p><p>Praesent vel velit mauris, ut volutpat magna. Duis eleifend, tortor eget ultrices tristique, purus sem malesuada nisi, quis lobortis sapien tellus et sem. Praesent ut pretium risus.</p>'),
 						$(document.createElement('span')).addClass('locationRating').append(
 							$(document.createElement('img')).attr('src','assets/star-full.png').addClass('locationRating'),
@@ -336,8 +352,8 @@
 			});
 		}
 		function clearOverlay() {
-			$('#overlay').fadeOut('500',function(){$(this).remove()});
-			$('#white').fadeOut('500',function(){$(this).remove()});
+			$('#overlay').fadeOut('200',function(){$(this).remove()});
+			$('#white').fadeOut('300',function(){$(this).remove()});
 		}
 
 		function distanceBetweenPoints(_lat1,_lon1,_lat2,_lon2) {
@@ -394,6 +410,36 @@
 		// round to the nearest 1/1000
 		function round(x) {
 			return Math.round( x * 1000) / 1000;
+		}
+
+		function drawSpinner() {
+			$(document.createElement('div')).attr('id','white').css({
+				'width': $('body').innerWidth() + 'px',
+				'height': $('body').innerHeight() + 'px'
+			}).appendTo($('body'));
+
+			$(document.createElement('div')).addClass('spinner').css({
+				'top': $('body').innerHeight()/4 - 27 + 'px',
+				'left': $('body').innerWidth()/2 - 27 + 'px'
+			}).append(
+				$(document.createElement('div')).addClass('bar1'),
+				$(document.createElement('div')).addClass('bar2'),
+				$(document.createElement('div')).addClass('bar3'),
+				$(document.createElement('div')).addClass('bar4'),
+				$(document.createElement('div')).addClass('bar5'),
+				$(document.createElement('div')).addClass('bar6'),
+				$(document.createElement('div')).addClass('bar7'),
+				$(document.createElement('div')).addClass('bar8'),
+				$(document.createElement('div')).addClass('bar9'),
+				$(document.createElement('div')).addClass('bar10'),
+				$(document.createElement('div')).addClass('bar11'),
+				$(document.createElement('div')).addClass('bar12')
+			).appendTo($('body'));
+		}
+
+		function clearSpinner() {
+			$('.spinner').fadeOut('200',function(){$(this).remove()});
+			$('#white').fadeOut('300',function(){$(this).remove()});
 		}
 	</script>
 

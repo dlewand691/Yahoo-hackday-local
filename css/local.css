@@ -19,7 +19,7 @@ body {
 }
 
 #window {
-	width: 720px;
+	width: 840px;
 	overflow: hidden;
 }
 #container {
@@ -67,6 +67,10 @@ body {
 	height: 47px;
 	width: 48px;
 	background: url(../assets/icon-popup.png) center center no-repeat;
+	opacity: .75;
+}
+.element:hover .infoButton {
+	opacity: 1;
 }
 
 .element .caption {
@@ -84,13 +88,20 @@ body {
 	font-weight: bold;
 	font-size: 15pt;
 	display: block;
+	opacity: .75;
 }
 .element .caption .locationDistance {
 	font-family: 'Helvetica';
 	font-weight: 100;
 	font-size: 15pt;
 	display: block;
+	opacity: .75;
 }
+.element:hover .caption .locationName,
+.element:hover .caption .locationDistance {
+	opacity: 1;
+}
+
 
 
 .isotope,
@@ -121,7 +132,7 @@ body {
 
 
 #main {
-	width: 720px;
+	width: 840px;
 	background: rgba(255,255,255,.85);
 	border: 20px solid rgba(255,255,255,0);
 	border-radius: 10px;
@@ -130,13 +141,13 @@ body {
 	box-shadow: 0px 5px 15px rgba(0,0,0,.75);
 }
 #container {
-	height: 1180px;
+	height: 1655px;
 	white-space: nowrap;
 	overflow: hidden;
 }
 #container .page {
-	height: 1180px;
-	width: 720px;
+	height: 1655px;
+	width: 840px;
 	display: inline-block;
 	vertical-align: top;
 }
@@ -184,7 +195,7 @@ header strong {
 #divider1 {
 	display: block;
 	height: 3px;
-	width: 720px;
+	width: 840px;
 	position: absolute;
 	top: 120px;
 	left: 0;
@@ -193,7 +204,7 @@ header strong {
 #divider2 {
 	display: block;
 	height: 22px;
-	width: 720px;
+	width: 840px;
 	position: absolute;
 	top: 190px;
 	left: 0;
@@ -202,7 +213,7 @@ header strong {
 #mask-left {
 	display: block;
 	height: 78px;
-	width: 50px;
+	width: 150px;
 	position: absolute;
 	top: 123px;
 	left: 0;
@@ -212,32 +223,36 @@ header strong {
 #mask-right {
 	display: block;
 	height: 78px;
-	width: 50px;
+	width: 150px;
 	position: absolute;
 	top: 123px;
 	right: 0;
 	background: url(../assets/mask-right.png) center left repeat-y;
 	z-index: 50;
 }
-#arrow-left,
-#arrow-right {
-	opacity: 0;
-}
 #arrow-left {
 	display: block;
 	position: absolute;
 	top: 150px;
-	left: 0;
+	left: -10px;
 	z-index: 100;
 }
 #arrow-right {
 	display: block;
 	position: absolute;
 	top: 150px;
-	right: 0;
+	right: -10px;
 	z-index: 100;
 }
-
+#arrow-left,
+#arrow-right {
+	display: none;
+	opacity: .75;
+}
+#arrow-left:hover,
+#arrow-right:hover {
+	opacity: 1;
+}
 
 #overlay {
 	position: absolute;
@@ -246,7 +261,7 @@ header strong {
 	border: 20px solid #FFF;
 	border-radius: 10px;
 	background: #FFF;
-	z-index: 20;
+	z-index: 550;
 	box-shadow: 0px 5px 15px rgba(0,0,0,.75);
 }
 
@@ -277,6 +292,7 @@ header strong {
 	margin-top: 5px;
 }
 #overlay .close {
+	opacity: .75;
 	height: 51px;
 	width: 50px;
 	display: block;
@@ -284,6 +300,9 @@ header strong {
 	top: -45px;
 	right: -45px;
 	background: url(../assets/close-x.png) center center no-repeat;
+}
+#overlay .close:hover {
+	opacity: 1;
 }
 
 #overlay .left .top.hero {
@@ -424,13 +443,10 @@ header strong {
 	background-image: radial-gradient(32% 32%, ellipse farthest-side, #99d4f5, #2e77bc 100%);
 	background-image: -webkit-radial-gradient(32% 32%, ellipse farthest-side, #99d4f5, #2e77bc 100%);
 	-webkit-animation: inToPartWhite 750ms forwards;
+	z-index: 500;
 }
 #white.resetting {
 	-webkit-animation: outFromPartWhite 750ms forwards;
-}
-
-#white {
-    z-index: 10;
 }
 
 @-webkit-keyframes inToPartWhite {
@@ -440,4 +456,46 @@ header strong {
 @-webkit-keyframes outFromPartWhite {
     0%   { opacity: .75; }
     100%   { opacity: 0; }
+}
+
+
+
+
+
+div.spinner {
+	position: absolute;
+	width: 54px;
+	height: 54px;
+	display: block;
+}
+
+div.spinner div {
+	width: 12%;
+	height: 26%;
+	background: #000;
+	position: absolute;
+	left: 44.5%;
+	top: 37%;
+	opacity: 0;
+	-webkit-animation: fade 1s linear infinite;
+	-webkit-border-radius: 50px;
+	-webkit-box-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+
+div.spinner div.bar1 {-webkit-transform:rotate(0deg) translate(0, -142%); -webkit-animation-delay: 0s;}    
+div.spinner div.bar2 {-webkit-transform:rotate(30deg) translate(0, -142%); -webkit-animation-delay: -0.9167s;}
+div.spinner div.bar3 {-webkit-transform:rotate(60deg) translate(0, -142%); -webkit-animation-delay: -0.833s;}
+div.spinner div.bar4 {-webkit-transform:rotate(90deg) translate(0, -142%); -webkit-animation-delay: -0.75s;}
+div.spinner div.bar5 {-webkit-transform:rotate(120deg) translate(0, -142%); -webkit-animation-delay: -0.667s;}
+div.spinner div.bar6 {-webkit-transform:rotate(150deg) translate(0, -142%); -webkit-animation-delay: -0.5833s;}
+div.spinner div.bar7 {-webkit-transform:rotate(180deg) translate(0, -142%); -webkit-animation-delay: -0.5s;}
+div.spinner div.bar8 {-webkit-transform:rotate(210deg) translate(0, -142%); -webkit-animation-delay: -0.41667s;}
+div.spinner div.bar9 {-webkit-transform:rotate(240deg) translate(0, -142%); -webkit-animation-delay: -0.333s;}
+div.spinner div.bar10 {-webkit-transform:rotate(270deg) translate(0, -142%); -webkit-animation-delay: -0.25s;}
+div.spinner div.bar11 {-webkit-transform:rotate(300deg) translate(0, -142%); -webkit-animation-delay: -0.1667s;}
+div.spinner div.bar12 {-webkit-transform:rotate(330deg) translate(0, -142%); -webkit-animation-delay: -0.0833s;}
+
+@-webkit-keyframes fade {
+	from {opacity: 1;}
+	to {opacity: 0.25;}
 }
