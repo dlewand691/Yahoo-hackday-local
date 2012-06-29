@@ -1,68 +1,425 @@
 <!doctype html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Local</title>
-  <meta name="description" content="">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Local</title>
+	<meta name="description" content="">
 
-  <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="css/local.css">
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="fonts/novecento.css">
+	<link rel="stylesheet" href="css/local.css">
 
-  <script src="js/jquery-1.7.2.min.js"></script>
-  <script src="js/jquery.isotope.min.js"></script>
-  <script src="js/jquery.yql.js"></script>
-  <script src="js/modernizr-2.5.3.min.js"></script>
+	<script src="http://www.google.com/jsapi"></script>
+	<script>
+		// Load jQuery
+		google.load("jquery", "1.7.1");
+		google.load('visualization', '1');
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 
-  <script>
-  $(document).ready(function(){
-    $.YQL("select * from html where url=\"http://pinterest.com/tcheller/local-bookstores/\" and xpath=\"//a[@class='PinImage ImgLink']\"",function(content){
-      $(content.query.results.a).each(function(){
-        $('#container').append(
-          $(document.createElement('div')).addClass('element').addClass('height'+Math.floor(Math.random()*2+1)).addClass('width'+Math.floor(Math.random()*3+1)).append(
-            $(document.createElement('img')).attr('src',this.img.src.replace("_b.jpg","_f.jpg"))
-          )
-        )
-      });
+	<script src="js/jquery.isotope.min.js"></script>
+	<script src="js/jquery.yql.js"></script>
+	<script src="js/jquery.swipe.js"></script>
+	<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+	<script src="https://raw.github.com/HPNeo/gmaps/master/gmaps.js"></script>
 
-      $(function(){
-        
-        var $container = $('#container');
-        
-        
-        // add randomish size classes        
-        $container.isotope({
-          itemSelector: '.element',
-          masonry : {
-            columnWidth : 120
-          }
-        });
-        
-        
-        // change size of clicked element
-        $container.delegate( '.element', 'click', function(){
-          $(this).toggleClass('large');
-          $container.isotope('reLayout');
-        });
 
-        
+	<script>
+		var atlasData = [];
+		var pinterestData = [];
+		var categories = ['restaurants','clothiers','jewelers','bookstores','grocers'];
+		var currPage = 0;
 
-        
-      });
-    });
-  });
-  </script>
+		$(function(){
+			for(var i = 0; i<categories.length; i++) {
+				atlasData[categories[i]] = null;
+				getAtlasData(categories[i]);
+				getPinterestData(categories[i]);
+			}
+			
+			drawBoard();
+
+			$('a.element').live('click',function(ev){
+				ev.preventDefault();
+				drawOverlay($(this).attr('href').replace('#',''));
+			});
+			$('a.close').live('click',function(ev){
+				ev.preventDefault();
+				clearOverlay();
+			});
+			$('a#arrow-left').live('click',function(ev){
+				ev.preventDefault();
+				prevCategory();
+			});
+			$('a#arrow-right').live('click',function(ev){
+				ev.preventDefault();
+				nextCategory();
+			});
+
+			$("#window").swipe({
+				swiped: function (e, ui) {
+					switch(ui.swipeDirection) {
+						case 'left':
+							prevCategory();
+							break;
+						case 'right':
+							nextCategory();
+							break;
+					}
+				}
+			});
+		});
+
+		function getAtlasData(_category) {
+			var googleSheet = null;
+			switch(_category) {
+				case 'bookstores':
+					googleSheet = 0;
+					break;
+				case 'restaurants':
+					googleSheet = 3;
+					break;
+				case 'clothiers':
+					googleSheet = 4;
+					break;
+				case 'jewelers':
+					googleSheet = 2;
+					break;
+				case 'grocers':
+					googleSheet = 5;
+					break;
+			}
+			var query = new google.visualization.Query(
+		        'https://docs.google.com/spreadsheet/tq?key=0Au68SqP4kr9TdGxkLUVxQzhmZjFKTy1Bb2dZTEFYUmc&gid='+googleSheet);
+			    query.setQuery("SELECT A,B,C,D,E,F,G,H,I,J,K");  
+			    query.send(function(_response){
+			    	atlasData[_category] = _response;
+			    });
+		}
+
+		function getPinterestData(_category) {
+			var pinterstBoard = null;
+			switch(_category) {
+				case 'bookstores':
+					pinterestBoard = 'local-bookstores';
+					break;
+				case 'restaurants':
+					pinterestBoard = 'local-restaurants';
+					break;
+				case 'clothiers':
+					pinterestBoard = 'local-clothing-shop';
+					break;
+				case 'jewelers':
+					pinterestBoard = 'local-jewelry';
+					break;
+				case 'grocers':
+					pinterestBoard = 'local-groceries';
+					break;
+			}
+
+			$.YQL("select * from html where url=\"http://pinterest.com/tcheller/"+pinterestBoard+"/\" and xpath=\"//a[@class='PinImage ImgLink']\"",function(content){
+				pinterestData[_category] = content;
+			});
+		}
+
+		function handleReponse(_response) {
+			atlasData = _response
+			return false;
+
+		    if (_response.isError()) {
+		        console.log('Error in query: ' + _response.getMessage() + ' ' + _response.getDetailedMessage());
+		        return;
+		    }
+		}
+
+		function drawBoard() {
+
+			var _category = categories.pop();
+
+			if(atlasData[_category] == null || pinterestData[_category] == null) {
+				setTimeout(function(){drawBoard();}, 500);
+				categories.push(_category);
+				return false;
+			}
+
+			/* Draw Pinterest Data */
+			$('#container').append($(document.createElement('div')).addClass('page').attr('id',_category));
+
+			$('#container #'+_category+'.page').append(
+				$(document.createElement('h1')).text(_category)
+			);
+
+			$(pinterestData[_category].query.results.a).each(function(){
+				$('#container #'+_category+'.page').append(
+					$(document.createElement('a')).attr('href','#'+this.href.split('/')[2]).addClass('element height'+Math.floor(Math.random()*2+2) + ' width'+Math.floor(Math.random()*2+2))
+						.css({
+							'background': 'url('+this.img.src.replace("_b.jpg","_f.jpg")+')',
+						})
+						.attr({
+							'rel': this.href.split('/')[2]
+						})
+						.data('pinterest',{
+							'img': this.img.src.replace("_b.jpg","_f.jpg")
+						})
+						.append(
+							$(document.createElement('div')).addClass('infoButton'),
+							$(document.createElement('div')).addClass('caption').append(
+								$(document.createElement('div')).addClass('pointer'),
+								$(document.createElement('strong')).addClass('locationName'),
+								$(document.createElement('span')).addClass('locationDistance')
+							)
+						)
+				)
+			});
+
+			/* Draw Atlas Data */
+		    var data = atlasData[_category].getDataTable();
+
+		    for(var row = 0; row < data.getNumberOfRows(); row++) {
+
+		        var pinId = data.getValue(row,0);
+		        var name = data.getValue(row,1);
+		        var streetAddress = data.getValue(row,2);
+		        var city = data.getValue(row,3);
+		        var state = data.getValue(row,4);
+		        var zipCode = data.getValue(row,5);
+		        var url = data.getValue(row,6);
+		        var lat = data.getValue(row,7);
+		        var lon = data.getValue(row,8);
+		        var hrsmf = data.getValue(row,9);
+		        var hrsss = data.getValue(row,10);
+
+		        var locDist = distanceBetweenPoints(40.741681,-73.985088,lat,lon);
+
+		        $('.element[rel='+pinId+'] .locationName').text(name);
+		        $('.element[rel='+pinId+'] .locationDistance').text(locDist.km.toFixed(1) + 'km ' + locDist.dir);
+		        $('.element[rel='+pinId+']').data('atlas',{
+		        	'name': name,
+		        	'streetAddress': streetAddress,
+		        	'city': city,
+		        	'state': state,
+		        	'zipCode': zipCode,
+		        	'url': url,
+		        	'lat': lat,
+		        	'lon': lon,
+		        	'locDist': locDist,
+		        	'hrsmf': hrsmf,
+		        	'hrsss': hrsss
+		        });
+
+		    }
+
+			// add randomish size classes
+			$('#container #'+categories[_category]+'.page').isotope({
+				itemSelector: '.element',
+				masonry : {
+					columnWidth : 120
+				}
+			});
+
+			if(categories.length > 0) {
+				drawBoard(atlasData, pinterestData, categories[_category]);
+			}
+
+			gotoCategory(0);
+		}
+
+		function nextCategory() {
+			gotoCategory((currPage==$('.page').length-1)?currPage:currPage+1);
+		}
+		function prevCategory() {
+			gotoCategory((currPage==0)?currPage:currPage-1);
+		}
+		function gotoCategory(_index) {
+			$('#container').animate({'margin-left': -1 * 720 * _index + 'px'});
+			currPage = _index;
+			$('.page').removeClass('prev next curr');
+			$('.page').each(function(){
+				if ($(this).index('.page') < _index) {
+					$(this).addClass('prev');
+				} else if ($(this).index('.page') > _index) {
+					$(this).addClass('next');
+				} else {
+					$(this).addClass('curr');
+				}
+
+				setTimeout(function(){$('.page').removeClass('prevFromCurr nextFromCurr currFromPrev currFromNext')}, 500);
+			});
+
+			if (currPage == 0) {
+				$('#arrow-left').fadeOut();
+				$('#arrow-right').fadeIn();
+			}
+			if (currPage == 0) {
+				$('#arrow-left').fadeOut();
+				$('#arrow-right').fadeIn();
+			}
+		}
+
+		function drawOverlay(_id) {
+			var _obj = $('.element[rel='+_id+']');
+
+			$(document.createElement('div')).attr('id','white').css({
+				'width': $('body').innerWidth() + 'px',
+				'height': $('body').innerHeight() + 'px'
+			}).appendTo($('body'));
+
+			$(document.createElement('div')).attr('id','overlay').css({
+				'top': $('body').innerHeight()/2 - 320 + 'px',
+				'left': $('body').innerWidth()/2 - 320 + 'px'
+			}).append(
+				$(document.createElement('a')).addClass('close').attr('href','#close'),
+				$(document.createElement('div')).addClass('left').append(
+					$(document.createElement('div')).addClass('top hero'),
+					$(document.createElement('div')).addClass('bottom details').append(
+						$(document.createElement('img')).addClass('point '+$(_obj).data('atlas')['locDist'].dir).attr('src','assets/point-blue.png'),
+						$(document.createElement('strong')).addClass('locationName').text($(_obj).data('atlas')['name']),
+						$(document.createElement('span')).addClass('locationDistance').text($(_obj).data('atlas')['locDist'].km.toFixed(1) + 'km ' + $(_obj).data('atlas')['locDist'].dir),
+						$(document.createElement('span')).addClass('locationDescription').html('<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tellus augue, laoreet a varius eget, congue nec ante. Sed feugiat elementum odio ut molestie.</p><p>Praesent vel velit mauris, ut volutpat magna. Duis eleifend, tortor eget ultrices tristique, purus sem malesuada nisi, quis lobortis sapien tellus et sem. Praesent ut pretium risus.</p>'),
+						$(document.createElement('span')).addClass('locationRating').append(
+							$(document.createElement('img')).attr('src','assets/star-full.png').addClass('locationRating'),
+							$(document.createElement('img')).attr('src','assets/star-full.png').addClass('locationRating'),
+							$(document.createElement('img')).attr('src','assets/star-full.png').addClass('locationRating'),
+							$(document.createElement('img')).attr('src','assets/star-full.png').addClass('locationRating'),
+							$(document.createElement('img')).attr('src','assets/star-full.png').addClass('locationRating')
+						)
+					)
+				),
+				$(document.createElement('div')).addClass('right').append(
+					$(document.createElement('div')).attr('id','map').addClass('top map'),
+					$(document.createElement('div')).addClass('bottom info').append(
+						$(document.createElement('div')).addClass('address').text('Address:'),
+						$(document.createElement('div')).addClass('addressData').html($(_obj).data('atlas')['streetAddress'] + '<br />' + $(_obj).data('atlas')['city'] + ', ' + $(_obj).data('atlas')['state'] + ' ' + $(_obj).data('atlas')['zipCode']),
+						$(document.createElement('div')).addClass('hours').text('Hours:'),
+						$(document.createElement('div')).addClass('hoursData').html('<span>Mon-Fri</span> '+$(_obj).data('atlas')['hrsmf']+'<br />'+'<span>Sat-Sun</span> '+$(_obj).data('atlas')['hrsss']),
+						$(document.createElement('div')).addClass('scan').text(''),
+						$(document.createElement('div')).addClass('code').append(
+							$(document.createElement('img')).attr('src','assets/qrcode.png')
+						)
+					)
+				)
+			).appendTo($('body'));
+
+			$('#overlay .left .top.hero').css({
+				'background': 'url('+$(_obj).data('pinterest')['img']+')'
+			})
+			
+			var map;
+			$(document).ready(function(){
+			  map = new GMaps({
+			    div: '#map',
+			    zoom: 14,
+			    disableDefaultUI: true,
+			    lat: (40.741681+$(_obj).data('atlas')['lat'])/2,
+			    lng: (-73.985088+$(_obj).data('atlas')['lon'])/2
+			  });
+			  map.drawOverlay({
+			    lat: 40.741681,
+			    lng: -73.985088,
+			    content: '<img class="startPoint" src="/assets/mapicon-start.png">'
+			  });
+			  map.drawOverlay({
+			    lat: $(_obj).data('atlas')['lat'],
+			    lng: $(_obj).data('atlas')['lon'],
+			    height: '25px',
+			    width: '33px',
+			    content: '<img class="endPoint" src="/assets/mapicon-end.png">'
+			  });
+			  map.drawRoute({
+			    origin: [40.741681,-73.985088],
+			    destination: [$(_obj).data('atlas')['lat'],$(_obj).data('atlas')['lon']],
+			    travelMode: 'walking',
+			    strokeColor: '#007DC3',
+			    strokeOpacity: 0.6,
+			    strokeWeight: 6
+			  });
+			});
+		}
+		function clearOverlay() {
+			$('#overlay').fadeOut('500',function(){$(this).remove()});
+			$('#white').fadeOut('500',function(){$(this).remove()});
+		}
+
+		function distanceBetweenPoints(_lat1,_lon1,_lat2,_lon2) {
+			var Rm = 3961; // mean radius of the earth (miles) at 39 degrees from the equator
+			var Rk = 6373; // mean radius of the earth (km) at 39 degrees from the equator
+			var t1, n1, t2, n2, lat1, lon1, lat2, lon2, dlat, dlon, a, c, dm, dk, mi, km, dir;
+				
+			// get values for lat1, lon1, lat2, and lon2
+			t1 = _lat1;
+			n1 = _lon1;
+			t2 = _lat2
+			n2 = _lon2;
+			
+			// convert coordinates to radians
+			lat1 = deg2rad(t1);
+			lon1 = deg2rad(n1);
+			lat2 = deg2rad(t2);
+			lon2 = deg2rad(n2);
+			
+			// find the differences between the coordinates
+			dlat = lat2 - lat1;
+			dlon = lon2 - lon1;
+			
+			// here's the heavy lifting
+			a  = Math.pow(Math.sin(dlat/2),2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon/2),2);
+			c  = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); // great circle distance in radians
+			dm = c * Rm; // great circle distance in miles
+			dk = c * Rk; // great circle distance in km
+			
+			// round the results down to the nearest 1/1000
+			mi = round(dm);
+			km = round(dk);
+			
+			if(_lat2 > _lat1) {
+				dir = 'north';
+			} else {
+				dir = 'south';
+			}
+			if(_lon2 > _lon1) {
+				dir += 'east';
+			} else {
+				dir += 'west';
+			}
+
+			return {'mi': mi,'km': km, 'dir': dir};
+		}
+
+		// convert degrees to radians
+		function deg2rad(deg) {
+			rad = deg * Math.PI/180; // radians = degrees * pi/180
+			return rad;
+		}
+		
+		// round to the nearest 1/1000
+		function round(x) {
+			return Math.round( x * 1000) / 1000;
+		}
+	</script>
+
 </head>
 <body>
-  <header>
+	
+	<div id="main" role="main">
+		<header>
+			<img src="assets/logo-shopSmall.png" style="width: 71px; height: 72px;" id="shopSmallLogo">
+			<strong>New York</strong>
+		</header>
+		<div id="divider1"></div>
+		<div id="divider2"></div>
 
-  </header>
-  <div role="main">
-    <div id="container">
+		<div id="window">
+			<div id="container"></div>
+		</div>
 
-    </div>
-  </div>
-  <footer>
+		<div id="mask-left"></div>
+		<div id="mask-right"></div>
+		<a href="#left" id="arrow-left"><img src="assets/swipe-left.png"></a>
+		<a href="#right" id="arrow-right"><img src="assets/swipe-right.png"></a>
+		
+		<footer>
 
-  </footer>
+		</footer>
+	</div>
 </body>
 </html>
